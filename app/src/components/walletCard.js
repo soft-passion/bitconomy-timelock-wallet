@@ -133,7 +133,7 @@ function WalletCard({
       }).once("confirmation", (confirmation, recipet) => {
         eventEmitter.emit("confirmation", confirmation, recipet);
       }).on("error", error => {
-        eventEmitter.emit("error", error);
+        console.log("error", error);
       });
 
       return eventEmitter;
@@ -142,33 +142,38 @@ function WalletCard({
     }
   }
   const claimEth = async () => {
-    const selectedAddress = drizzleState.accounts[0];
-    if (selectedAddress) {
+try {
+  const selectedAddress = drizzleState.accounts[0];
+  if (selectedAddress) {
 
-      console.log("Sending meta transaction");
-      let userAddress = selectedAddress;
-      const contract = getWalletContract(contractAddress)
-      let nonce = await contract.methods.getNonce(userAddress).call();
-      let functionSignature = contract.methods.withdraw().encodeABI();
+    console.log("Sending meta transaction");
+    let userAddress = selectedAddress;
+    const contract = getWalletContract(contractAddress)
+    let nonce = await contract.methods.getNonce(userAddress).call();
+    let functionSignature = contract.methods.withdraw().encodeABI();
 
-      //userAddress, functionSignature, contract, contractAddress, chainId)
-      executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
-      // let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
-      // const signature = await web3.eth.personal.sign(
-      //   "0x" + messageToSign.toString("hex"),
-      //   userAddress
-      // );
+    //userAddress, functionSignature, contract, contractAddress, chainId)
+    executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
+  
+    // let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
+    // const signature = await web3.eth.personal.sign(
+    //   "0x" + messageToSign.toString("hex"),
+    //   userAddress
+    // );
 
-      // console.info(`User signature is ${signature}`);
-      // let { r, s, v } = getSignatureParameters(signature);
+    // console.info(`User signature is ${signature}`);
+    // let { r, s, v } = getSignatureParameters(signature);
 
-      // //alert(userAddress, functionSignature, r, s, v);
+    // //alert(userAddress, functionSignature, r, s, v);
 
-      // sendTransaction(userAddress, functionSignature, r, s, v);
+    // sendTransaction(userAddress, functionSignature, r, s, v);
 
-    } else {
-      alert("Transaction confirmed");
-    }
+  } else {
+    alert("Transaction confirmed");
+  }
+} catch (error) {
+  console.log(error);
+}
 
   };
   const claimToken = async () => {
@@ -272,7 +277,7 @@ function WalletCard({
           <Flex justifyContent={"space-between"}>
             <Button
 
-              // disabled={Date.now() < contractData.unlockDate * 1000}
+              disabled={Date.now() < contractData.unlockDate * 1000}
               onClick={e => claimEth(e)}
             >
               Claim Eth
