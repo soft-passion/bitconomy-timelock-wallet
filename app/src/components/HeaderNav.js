@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, Box, Button, Flex, Image } from "rimble-ui";
+import { Text, Box, Button, Flex, Image ,Heading} from "rimble-ui";
 import styled from "styled-components";
 import { drizzleConnect } from "@drizzle/react-plugin";
 import logo from "../images/rimble-logo.svg";
@@ -22,7 +22,6 @@ const hasMetaMask= () => {
 }
 const connectWallet = () => {
   // initiate wallet connection
- // console.log(hasMetaMask(),'test');
   return;
 };
 
@@ -44,11 +43,14 @@ function HeaderNav({ drizzle, preflightCheck, address, accountBalances }) {
 
   return (
     <StyledHeader justifyContent={"space-between"} p={3} bg={"white"}>
-      <Image src={logo} />
+      {/* <Image src={logo} /> */}
+      <Heading as={"h1"}>Biconomy</Heading>
+
       {account && balance ? (
         <Flex>
           <Flex alignItems={"center"} mr={4}>
             <Image src={walletIcon} mr={2} />
+ 
             <Box>
               <Text
                 fontWeight={600}

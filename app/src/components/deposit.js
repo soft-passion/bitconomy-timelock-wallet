@@ -16,7 +16,8 @@ import {
   Form,
   Field,
   Input,
-  Select
+  Select,
+  LocalSee
 } from "rimble-ui";
 
 const ModalFooter = styled(Flex)`
@@ -127,51 +128,61 @@ const CreateWalletForm = ({drizzle,address}) => {
     const [owner, setOwner] = useState(address)
     const [ethAmount, setEthAmoun] = useState(0)
     const [tokenAmount, setTokenAmount] = useState(0)
-    const [releaseTime, setReleaseTime] = useState(new Date())
-    console.log(releaseTime,'releaseTime');
-    const createWallet= async(e)=>{
-     //   e.preventDefault();
+    const [releaseTime, setReleaseTime] = useState(Date.now())
+     const createWallet= async(e)=>{
+       e.preventDefault();
+       const eth = parseInt(
+      drizzle.  web3.utils.fromWei(ethAmount, "ether")
+      );
         const tokenAddress =drizzle.contracts.BiToken.address;
-        console.log(owner,
-            releaseTime,
-           tokenAmount,
-           ethAmount,'tokenAddress');
-        console.log(Math.floor(
-            new Date(releaseTime).getTime() / 1000
-          ),'tokenAddress');
-        console.log(drizzle.web3.utils.toBN(ethAmount),'tokenAddress');
-        console.log(tokenAddress,'tokenAddress');
-        const tx = await drizzle.contracts.TimeLockedWalletFactory.methods.newTimeLockedWallet(owner,
+       if(tokenAmount>0){
+         await drizzle.contracts.BiToken.methods.approve(drizzle.contracts.TimeLockedWalletFactory.address,tokenAmount).send({from:address}).once('transactionHash', async(hash)=> {
+          const tx = await drizzle.contracts.TimeLockedWalletFactory.methods.newTimeLockedWallet(owner,
             Math.floor(
                 new Date(releaseTime).getTime() / 1000
               ),
            tokenAmount,
             tokenAddress).send ({
             from:address,
-              value: drizzle.web3.utils.toBN(ethAmount)
-            }).once('transactionHash', function(hash) {console.log(hash,'hash');;});
+              value: eth//drizzle.web3.utils.toBN(ethAmount)
+            }).once('transactionHash', function(hash) {console.log(hash,'hash')});
             
-console.log(tx,'tx');
-console.log(drizzle,'drizzle');
-    }
+        });
+       }else{
+        const tx = await drizzle.contracts.TimeLockedWalletFactory.methods.newTimeLockedWallet(owner,
+          Math.floor(
+              new Date(releaseTime).getTime() / 1000
+            ),
+         tokenAmount,
+          tokenAddress).send ({
+          from:address,
+            value: drizzle.web3.utils.toBN(ethAmount)
+          }).once('transactionHash', function(hash) {console.log(hash,'hash')});
+          
+       }
+       }
   return (
     <Box>
       <Card>
         <Heading as={"h3"}>Create Wallet Instantly</Heading>
         <Form>
      
-          <Field label="Currency">
+       <Flex>
+       <Field label="Currency">
             <Select readOnly options={[{ value: "eth", label: "Ethereum" }]} />
           </Field>
           <Field label="Amount">
-            <Input type="number" min={"0"} placeholder={"$50.00"} value={ethAmount} onChange={(data)=>setEthAmoun(data.target.value)}/>
+            <Input type="number" min={"0"} placeholder={"1 wei"} value={ethAmount} onChange={(data)=>setEthAmoun(data.target.value)}/>
           </Field>
-          <Field label="Token">
+       </Flex>
+     <Flex>
+     <Field label="Token">
             <Select readOnly options={[{ value: "token", label: "Biconomy Token" }]} />
           </Field>
           <Field label="Amount">
             <Input type="number" min={"0"} placeholder={"BiT 1.00"} value={tokenAmount}  onChange={(data)=>setTokenAmount(data.target.value)}/>
           </Field>
+     </Flex>
         
        <div>
        <Field label="Wallet Owner">
@@ -184,7 +195,7 @@ console.log(drizzle,'drizzle');
          
           <Text color={"#aaa"}>Summary</Text>
           <Flex justifyContent={"space-between"}>
-            <Text color={"#aaa"}>~ ETH Amount</Text>{" "}
+            <Text color={"#aaa"}>~ Wei Amount</Text>{" "}
             <Text color={"#aaa"}> {ethAmount}</Text>
           </Flex>
           <Flex justifyContent={"space-between"} mb={2}>
@@ -193,9 +204,21 @@ console.log(drizzle,'drizzle');
           </Flex>
           <Flex justifyContent={"space-between"} mb={2}>
             <Text color={"#aaa"}>Release Time</Text>{" "}
-            <Text color={"#aaa"}> </Text>
+            <Text color={"#aaa"}> {new Date(releaseTime).toLocaleString() }</Text>
           </Flex>
-      
+        {tokenAmount>0&&(<Flex>
+          <Flex mt={3} mb={4}>
+          <Icon name={"InfoOutline"} size={"32px"} mr={3} color={"primary"} />
+          <Text>
+          Please notes that Metamask will pop up twice and you need to sign th two transactions to stake successfully
+          </Text>        
+        </Flex>
+          <Flex mt={3} mb={4}>
+          <Text color={"#aaa"} >
+            In order to let smart contract stake your token, you need to allow that through a transaction
+          </Text>       
+        </Flex>
+        </Flex>)}
           <Button
             width={[1]}
             onClick={e => createWallet(e)}
