@@ -1,70 +1,52 @@
-# Drizzle Biconomy Box
+# Biconomy Time Locked Smart Contract Wallet
 
-This box comes with everything you need to start using smart contracts that enable biconomy meta transaction  feature. It includes example for using the SDK  `@biconomy/mexa` for both ( native meta transaction and normal contracts)  and using `https://api.biconomy.io` to give you a complete overview of biconomy's capabilities.
+This repo is to create  a Time Locked Smart Contract Wallet on Kovan Network which allows anyone to deposit ERC20 or Ether in a smart contract locked for a certain interval of time, post which receiver can claim those tokens/ether.
 
+Claim operation is meta transaction enabled with Biconomy.
+## Features
+- user can stake eth or token in time lock wallets for a certain time he decides , 
+- user when login, can see list of wallets associated with his ethereum address 
+- for each wallet, user can claim his funds gasless  
+- mint tokens function is supported for testing 
 ## Installation
 
-First ensure you are in a new and empty directory.
-
-1. Run the `unbox` command via `npx` and skip to step 3. This will install all necessary dependencies. A Create-React-App is generated in the `app` directory.
-   ```js
-   npx truffle unbox biconomy-drizzle
-   ```
-
-2. Alternatively, you can install Truffle globally and run the `unbox` command.
+1. First clone this repo.
     ```javascript
-    npm install -g truffle
-    truffle unbox biconomy-drizzle
-    ```
-
-3. Run the development console.
-    ```javascript
-    truffle develop
-    ```
-
-4. Compile and migrate the smart contracts. Note inside the development console we don't preface commands with `truffle`.
-    ```javascript
-    compile
-    truffle migrate --network ropsten `feel free to choose any supported network by biconomy`
-    ```
-
-5. In the `app` directory, we run the React app. Smart contract changes must be manually recompiled and migrated.
-    ```javascript
-    // in another terminal (i.e. not in the truffle develop prompt)
     cd app
-    npm run start
+    // using npm
+    // make sure you have node version 11  
+    npm install 
+    // using yarn 
+    yarn install
     ```
-
-6. Truffle can run tests written in Solidity or JavaScript against your smart contracts. Note the command varies slightly if you're in or outside of the development console.
+2. Run the app locally.
     ```javascript
-    // inside the development console
-    test
-
-    // outside the development console
-    truffle test
+    npm start
     ```
 
-7. Jest is included for testing React components. Compile your contracts before running Jest, or you may receive some file not found errors.
-    ```javascript
-    // ensure you are inside the app directory when running this
-    npm run test
-    ```
 
-8. To build the application for production, use the build script. A production build will be in the `app/build` folder.
-    ```javascript
-    // ensure you are inside the app directory when running this
-    npm run build
-    ```
+## Testing
+ To test the smart contract .
+ 
+ Truffle can run tests written in  JavaScript against your smart contracts. Note the command varies slightly if you're in or outside of the development console.
+```javascript
+// test 
+test
+
+//outside the development console
+truffle test
+```
 
 ## FAQ
 
+
 * __Where do I find more information about Biconomey?__
 
-    Check out our [documentation](https://docs.biconomy.io/).
+    Check out the [documentation](https://docs.biconomy.io/).
 
 * __Where do I find more information about Drizzle?__
 
-    Check out our [documentation](http://truffleframework.com/docs/drizzle/getting-started) or any of the three repositories ([`drizzle`](https://github.com/trufflesuite/drizzle), [`drizzle-react`](https://github.com/trufflesuite/drizzle-react), [`drizzle-react-components`](https://github.com/trufflesuite/drizzle-react-components)).
+    Check out the [documentation](http://truffleframework.com/docs/drizzle/getting-started) or any of the three repositories ([`drizzle`](https://github.com/trufflesuite/drizzle), [`drizzle-react`](https://github.com/trufflesuite/drizzle-react), [`drizzle-react-components`](https://github.com/trufflesuite/drizzle-react-components)).
 
 * __Where is my production build?__
 
@@ -74,4 +56,11 @@ First ensure you are in a new and empty directory.
 
     This box is a marriage of [Truffle](http://truffleframework.com/) and a React setup created with [create-react-app](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md). Either one would be a great place to start!
 ## Credits
-All the credits goes to [drizzle-box](https://github.com/truffle-box/drizzle-box)  and [metatx-standard](https://github.com/bcnmy/metatx-standard) 
+All the UI credits goes to
+
+ [drizzle-box](https://github.com/truffle-box/drizzle-box)  
+ [drimble-ui](https://github.com/ConsenSysMesh/rimble-ui) 
+ 
+All the time Lock wallet credits goes to [uport-time-locked-wallets](https://github.com/radek1st/uport-time-locked-wallets) 
+
+All the Meta transaction  credits goes to [metatx-standard](https://github.com/bcnmy/metatx-standard) 
