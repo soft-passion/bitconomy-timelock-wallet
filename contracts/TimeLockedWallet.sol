@@ -2,10 +2,10 @@ pragma solidity 0.6.2;
 
 // import "./BiToken.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./BasicMetaTransaction.sol";
+ 
 
-
-contract TimeLockedWallet is BasicMetaTransaction {
+contract TimeLockedWallet  {
+    address relayer;
     address tokenAddress;
     address public architect;
     address payable public  owner;
@@ -15,19 +15,33 @@ contract TimeLockedWallet is BasicMetaTransaction {
         require( _msgSender() == owner,"Unauthorized");
         _;
     }
- 
+    function _msgSender() internal view returns(address  sender) {
+        if(msg.sender == relayer) {
+            bytes memory array = msg.data;
+            uint256 index = msg.data.length;
+            assembly {
+                // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
+                sender := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
+            }
+        } else {
+            return msg.sender;
+        }
+    }
 
     constructor(
         address _architect,
         address payable  _owner,
         uint256 _unlockDate,
-        address _tokenAddress
+     
+        address _tokenAddress,
+           address _relayer
     ) public  {
         require(
             _unlockDate > now,
             "TimeLockedWallet: release time is before current time"
         );
 
+        relayer = _relayer;
         architect = _architect;
         owner = _owner;
         unlockDate = _unlockDate;
@@ -42,16 +56,16 @@ contract TimeLockedWallet is BasicMetaTransaction {
     }
 
     // callable by owner only, after specified time
-    function withdraw() public onlyOwner {
-        require(now >= unlockDate,"TimeLock:Can't withdraw before releasing time");
+    function withdraw() external onlyOwner {
+       require(now >= unlockDate,"TimeLock:Can't withdraw before releasing time");
         //now send all the balance
         owner.transfer(address(this).balance);
         Withdrew(owner, address(this).balance);
     }
 
     // callable by owner only, after specified time, only for Tokens implementing ERC20
-    function withdrawTokens() public onlyOwner {
-        require(now >= unlockDate,"TimeLock:Can't withdraw before releasing time");
+    function withdrawTokens() external onlyOwner {
+       require(now >= unlockDate,"TimeLock:Can't withdraw before releasing time");
         //now send all the token balance
         uint256 tokenBalance = IERC20(tokenAddress).balanceOf(address(this));
         IERC20(tokenAddress).transfer(owner, tokenBalance);

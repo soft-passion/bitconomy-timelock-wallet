@@ -28,14 +28,14 @@ contract BasicMetaTransaction {
      * @param sigS S part of the signature
      * @param sigV V part of the signature
      */
-    function executeMetaTransaction(address userAddress, bytes memory functionSignature,
+    function executeMetaTransaction(address userAddress,address targetContract, bytes memory functionSignature,
         bytes32 sigR, bytes32 sigS, uint8 sigV) public payable returns(bytes memory) {
 
         require(verify(userAddress, nonces[userAddress], getChainID(), functionSignature, sigR, sigS, sigV), "Signer and signature do not match");
         nonces[userAddress] = nonces[userAddress].add(1);
 
         // Append userAddress at the end to extract it from calling context
-        (bool success, bytes memory returnData) = address(this).call(abi.encodePacked(functionSignature, userAddress));
+        (bool success, bytes memory returnData) = targetContract.call(abi.encodePacked(functionSignature, userAddress));
 
         require(success, "Function call not successful");
         emit MetaTransactionExecuted(userAddress, msg.sender, functionSignature);

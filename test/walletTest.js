@@ -17,6 +17,7 @@ const should = require('chai')
   .should();
 const tokenContract = artifacts.require('BiToken');
 const TimeLockedWalletFactory = artifacts.require('TimeLockedWalletFactory');
+
 const TimeLockedWallet = artifacts.require('TimeLockedWallet');
 contract('TimeLockedWalletFactory', (accounts) => {
   let openingTime;

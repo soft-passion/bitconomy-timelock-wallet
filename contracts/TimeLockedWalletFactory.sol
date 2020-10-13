@@ -7,11 +7,17 @@ import "./TimeLockedWallet.sol";
 
 contract TimeLockedWalletFactory is Ownable {
     mapping(address => address[]) wallets;
-
+    address public relayer;
+    constructor (address _relayer) public{
+                relayer = _relayer;
+    }
     function getWallets(address _user) public view returns (address [] memory wallet) {
         return wallets[_user];
     }
+    function setRelayer(address _relayer) public onlyOwner {
+                relayer = _relayer;
 
+    }
     function newTimeLockedWallet(
         address payable _owner,
         uint256 _unlockDate,
@@ -27,7 +33,8 @@ contract TimeLockedWalletFactory is Ownable {
             _msgSender(),
             _owner,
             _unlockDate,
-            tokenAddress
+            tokenAddress,
+            relayer
         )
 );
         // Add wallet to sender's wallets.

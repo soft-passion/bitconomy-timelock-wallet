@@ -17,7 +17,7 @@ function WalletCard({
   // enableBuyButton
 }) {
   const web3 = drizzle.web3;
-  console.log(contractAddress, 'contractAddress');
+  console.log(web3, 'web3');
   const [walletContract, setWalletContract] = useState(null)
   const [balance, setBalanace] = useState("0")
   const contractName = TimeLockedWallet.contractName
@@ -111,7 +111,7 @@ function WalletCard({
     var eventEmitter = new events.EventEmitter();
 
     if (contract && userAddress && functionSignature, chainId, contractAddress) {
-      let nonce = await contract.methods.getNonce(userAddress).call();
+      let nonce = await drizzle.contracts.BasicMetaTransaction.methods.getNonce(userAddress).call();
       let messageToSign = constructMetaTransactionMessage(nonce, chainId, functionSignature, contractAddress);
 
       const signature = await web3.eth.personal.sign(
@@ -124,7 +124,7 @@ function WalletCard({
 
       console.log("before transaction listener");
       // No need to calculate gas limit or gas price here
-      let transactionListener = contract.methods.executeMetaTransaction(userAddress, functionSignature, r, s, v).send({
+      let transactionListener = drizzle.contracts.BasicMetaTransaction.methods.executeMetaTransaction(userAddress,contractAddress, functionSignature, r, s, v).send({
         from: userAddress
       });
 
@@ -149,7 +149,7 @@ try {
     console.log("Sending meta transaction");
     let userAddress = selectedAddress;
     const contract = getWalletContract(contractAddress)
-    let nonce = await contract.methods.getNonce(userAddress).call();
+    let nonce = await drizzle.contracts.BasicMetaTransaction.methods.getNonce(userAddress).call();
     let functionSignature = contract.methods.withdraw().encodeABI();
 
     //userAddress, functionSignature, contract, contractAddress, chainId)
@@ -183,23 +183,23 @@ try {
       console.log("Sending meta transaction");
       let userAddress = selectedAddress;
       const contract = getWalletContract(contractAddress)
-      let nonce = await contract.methods.getNonce(userAddress).call();
+      let nonce = await drizzle.contracts.BasicMetaTransaction.methods.getNonce(userAddress).call();
       let functionSignature = contract.methods.withdrawTokens().encodeABI();
 
-      //userAddress, functionSignature, contract, contractAddress, chainId)
-      executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
-      // let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
-      // const signature = await web3.eth.personal.sign(
-      //   "0x" + messageToSign.toString("hex"),
-      //   userAddress
-      // );
+      // //userAddress, functionSignature, contract, contractAddress, chainId)
+      // executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
+      let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
+      const signature = await web3.eth.personal.sign(
+        "0x" + messageToSign.toString("hex"),
+        userAddress
+      );
 
-      // console.info(`User signature is ${signature}`);
-      // let { r, s, v } = getSignatureParameters(signature);
+      console.info(`User signature is ${signature}`);
+      let { r, s, v } = getSignatureParameters(signature);
 
-      // //alert(userAddress, functionSignature, r, s, v);
+      //alert(userAddress, functionSignature, r, s, v);
 
-      // sendTransaction(userAddress, functionSignature, r, s, v);
+      sendTransaction(userAddress, functionSignature, r, s, v);
 
     } else {
       alert("Transaction confirmed");
@@ -208,6 +208,10 @@ try {
   };
   const sendTransaction = async (userAddress, functionData, r, s, v) => {
     try {
+      let gasLimit = await drizzle.contracts.BasicMetaTransaction.methods
+      .executeMetaTransaction(userAddress, contractAddress,functionData, r, s, v)
+      .estimateGas({ from: userAddress });
+    let gasPrice = await web3.eth.getGasPrice();
       fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
         method: "POST",
         headers: {
@@ -216,11 +220,13 @@ try {
         },
         body: JSON.stringify({
           "to": contractAddress,
-          "apiId": "11c72576-fc72-4c3c-9731-113641f7e76b",
+          "apiId": "74741308-2238-489e-9898-4401debd24c3",
           "params": [
-            userAddress, functionData, r, s, v
+            userAddress,contractAddress, functionData, r, s, v
           ],
-          "from": userAddress
+          "from": userAddress,
+          "gasPrice": web3.utils.toHex(gasPrice),
+          "gasLimit": web3.utils.toHex(gasLimit)
         })
       })
         .then(response => response.json())
@@ -277,13 +283,13 @@ try {
           <Flex justifyContent={"space-between"}>
             <Button
 
-              disabled={Date.now() < contractData.unlockDate * 1000}
+              // disabled={Date.now() < contractData.unlockDate * 1000}
               onClick={e => claimEth(e)}
             >
               Claim Eth
                  </Button>
             <Button
-              disabled={Date.now() < contractData.unlockDate * 1000}
+              // disabled={Date.now() < contractData.unlockDate * 1000}
               onClick={e => claimToken(e)}
             >
               Claim Token
