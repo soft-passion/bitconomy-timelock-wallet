@@ -31,7 +31,7 @@ contract BasicMetaTransaction {
     function executeMetaTransaction(address userAddress,address targetContract, bytes memory functionSignature,
         bytes32 sigR, bytes32 sigS, uint8 sigV) public payable returns(bytes memory) {
 
-        require(verify(userAddress, nonces[userAddress], getChainID(), functionSignature, sigR, sigS, sigV), "Signer and signature do not match");
+        require(verify(userAddress,targetContract, nonces[userAddress], getChainID(), functionSignature, sigR, sigS, sigV), "Signer and signature do not match");
         nonces[userAddress] = nonces[userAddress].add(1);
 
         // Append userAddress at the end to extract it from calling context
@@ -51,10 +51,10 @@ contract BasicMetaTransaction {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
 
-    function verify(address owner, uint256 nonce, uint256 chainID, bytes memory functionSignature,
+    function verify(address owner,address targetContract, uint256 nonce, uint256 chainID, bytes memory functionSignature,
         bytes32 sigR, bytes32 sigS, uint8 sigV) public view returns (bool) {
 
-        bytes32 hash = prefixed(keccak256(abi.encodePacked(nonce, this, chainID, functionSignature)));
+        bytes32 hash = prefixed(keccak256(abi.encodePacked(nonce, targetContract, chainID, functionSignature)));
         address signer = ecrecover(hash, sigV, sigR, sigS);
         require(signer != address(0), "Invalid signature");
 		return (owner == signer);

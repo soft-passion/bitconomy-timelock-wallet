@@ -152,21 +152,21 @@ try {
     let nonce = await drizzle.contracts.BasicMetaTransaction.methods.getNonce(userAddress).call();
     let functionSignature = contract.methods.withdraw().encodeABI();
 
-    //userAddress, functionSignature, contract, contractAddress, chainId)
-    executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
+    // //userAddress, functionSignature, contract, contractAddress, chainId)
+    // executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
   
-    // let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
-    // const signature = await web3.eth.personal.sign(
-    //   "0x" + messageToSign.toString("hex"),
-    //   userAddress
-    // );
+    let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
+    const signature = await web3.eth.personal.sign(
+      "0x" + messageToSign.toString("hex"),
+      userAddress
+    );
 
-    // console.info(`User signature is ${signature}`);
-    // let { r, s, v } = getSignatureParameters(signature);
+    console.info(`User signature is ${signature}`);
+    let { r, s, v } = getSignatureParameters(signature);
 
-    // //alert(userAddress, functionSignature, r, s, v);
+    //alert(userAddress, functionSignature, r, s, v);
 
-    // sendTransaction(userAddress, functionSignature, r, s, v);
+    sendTransaction(userAddress, functionSignature, r, s, v);
 
   } else {
     alert("Transaction confirmed");
@@ -186,20 +186,20 @@ try {
       let nonce = await drizzle.contracts.BasicMetaTransaction.methods.getNonce(userAddress).call();
       let functionSignature = contract.methods.withdrawTokens().encodeABI();
 
-      // //userAddress, functionSignature, contract, contractAddress, chainId)
-      // executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
-      let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
-      const signature = await web3.eth.personal.sign(
-        "0x" + messageToSign.toString("hex"),
-        userAddress
-      );
+      //userAddress, functionSignature, contract, contractAddress, chainId)
+      executeMetaTransaciton(userAddress, functionSignature, contract, contractAddress, 42);
+      // let messageToSign = constructMetaTransactionMessage(nonce,  drizzleState.web3.networkId, functionSignature, contractAddress);
+      // const signature = await web3.eth.personal.sign(
+      //   "0x" + messageToSign.toString("hex"),
+      //   userAddress
+      // );
 
-      console.info(`User signature is ${signature}`);
-      let { r, s, v } = getSignatureParameters(signature);
+      // console.info(`User signature is ${signature}`);
+      // let { r, s, v } = getSignatureParameters(signature);
 
-      //alert(userAddress, functionSignature, r, s, v);
+      // //alert(userAddress, functionSignature, r, s, v);
 
-      sendTransaction(userAddress, functionSignature, r, s, v);
+      // sendTransaction(userAddress, functionSignature, r, s, v);
 
     } else {
       alert("Transaction confirmed");
@@ -220,7 +220,8 @@ try {
         },
         body: JSON.stringify({
           "to": contractAddress,
-          "apiId": "74741308-2238-489e-9898-4401debd24c3",
+          // "apiId": "4ca92cf7-9e50-4de6-8240-e57c42df51df",
+          "apiId": "b15efd0b-1a04-4135-a7ae-9d095e55cbc5	",
           "params": [
             userAddress,contractAddress, functionData, r, s, v
           ],
@@ -283,13 +284,13 @@ try {
           <Flex justifyContent={"space-between"}>
             <Button
 
-              // disabled={Date.now() < contractData.unlockDate * 1000}
+              disabled={Date.now() < contractData.unlockDate * 1000}
               onClick={e => claimEth(e)}
             >
               Claim Eth
                  </Button>
             <Button
-              // disabled={Date.now() < contractData.unlockDate * 1000}
+              disabled={Date.now() < contractData.unlockDate * 1000}
               onClick={e => claimToken(e)}
             >
               Claim Token
